@@ -12,9 +12,11 @@ import {
   DollarSign,
   Users,
   Grid,
-  FileText,
   AlertTriangle,
-  Award
+  Award,
+  Search,
+  Check,
+  X
 } from 'lucide-react';
 import { Business, Category } from '../types';
 
@@ -34,6 +36,8 @@ export const AdminPanelTab: React.FC = () => {
 
   // Selected administrative segment
   const [adminTab, setAdminTab] = useState<'biz' | 'pay' | 'cat' | 'users'>('biz');
+  const [bizFilter, setBizFilter] = useState<'active' | 'pending' | 'expired' | 'submissions'>('submissions');
+  const [vendorSearch, setVendorSearch] = useState('');
 
   // Category insertion state
   const [newCatNameEn, setNewCatNameEn] = useState('');
@@ -84,6 +88,18 @@ export const AdminPanelTab: React.FC = () => {
         ? `Status toggled: ${biz.name} is now ${nextStatus.toUpperCase()}`
         : `تم تحديث حالة النشاط: ${biz.name} الآن ${nextStatus === 'active' ? 'نشط' : 'معلق ومخفي'}`
     );
+  };
+
+  const handleMarkAsPaid = (biz: Business) => {
+    const updated: Business = { ...biz, status: 'active' };
+    updateBusiness(updated);
+    alert(`${biz.name} marked as PAID manually.`);
+  };
+
+  const handleReject = (biz: Business) => {
+    const updated: Business = { ...biz, status: 'suspended' }; // Send to suspended/expired queue
+    updateBusiness(updated);
+    alert(`${biz.name} submission rejected.`);
   };
 
   // Category addition trigger
@@ -172,12 +188,90 @@ export const AdminPanelTab: React.FC = () => {
       {/* SEGMENT 1: BUSINESS VETTING APPROVALS & SUSPENSIONS (Section 8) */}
       {adminTab === 'biz' && (
         <div className="space-y-4 animate-scale-up" id="admin-biz-section">
+          
+          {/* Financial Controls Analytics */}
+          <div className="grid grid-cols-2 gap-3 mb-4">
+            <div className="bg-[#1C1914] border border-[#2D2319] p-4 rounded-2xl relative overflow-hidden">
+              <DollarSign className="w-10 h-10 text-[#FFA048] absolute right-3 top-3 opacity-10" />
+              <p className="text-[9px] font-bold text-gray-500 uppercase tracking-widest mb-1">Platform Revenue</p>
+              <h3 className="text-xl font-black text-white">${(payments.length * 50).toLocaleString()}</h3>
+            </div>
+            <div className="bg-[#1C1914] border border-[#2D2319] p-4 rounded-2xl relative overflow-hidden">
+              <Award className="w-10 h-10 text-green-500 absolute right-3 top-3 opacity-10" />
+              <p className="text-[9px] font-bold text-gray-500 uppercase tracking-widest mb-1">Active Subs</p>
+              <h3 className="text-xl font-black text-green-400">{businesses.filter(b => b.status === 'active').length}</h3>
+            </div>
+          </div>
+
           <h3 className="text-xs font-black uppercase tracking-wider text-[#FFA048]">
             Directory Index approvals & Status Locking
           </h3>
+          
+          <div className="flex items-center bg-[#13110E] border border-[#2D2319] rounded-xl px-4 py-3 mb-2">
+            <Search className="w-4 h-4 text-gray-500 mr-3" />
+            <input 
+              type="text" 
+              placeholder="Search vendors by name, email, or city..." 
+              value={vendorSearch}
+              onChange={(e) => setVendorSearch(e.target.value)}
+              className="bg-transparent border-none text-white text-sm outline-none w-full placeholder:text-gray-600"
+            />
+          </div>
+
+          <div className="flex flex-wrap gap-2">
+            <button
+              onClick={() => setBizFilter('submissions')}
+              className={`px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase transition-all ${
+                bizFilter === 'submissions' ? 'bg-[#FFA048] text-black shadow-lg shadow-[#FFA048]/20' : 'bg-[#13110E] text-gray-400 border border-[#2D2319]'
+              }`}
+            >
+              New Submissions
+            </button>
+            <button
+              onClick={() => setBizFilter('active')}
+              className={`px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase transition-all ${
+                bizFilter === 'active' ? 'bg-green-500/20 text-green-400 border border-green-500/50' : 'bg-[#13110E] text-gray-400 border border-[#2D2319]'
+              }`}
+            >
+              Registered / Active
+            </button>
+            <button
+              onClick={() => setBizFilter('pending')}
+              className={`px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase transition-all ${
+                bizFilter === 'pending' ? 'bg-blue-500/20 text-blue-400 border border-blue-500/50' : 'bg-[#13110E] text-gray-400 border border-[#2D2319]'
+              }`}
+            >
+              Payment Pending
+            </button>
+            <button
+              onClick={() => setBizFilter('expired')}
+              className={`px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase transition-all ${
+                bizFilter === 'expired' ? 'bg-red-500/20 text-red-400 border border-red-500/50' : 'bg-[#13110E] text-gray-400 border border-[#2D2319]'
+              }`}
+            >
+              Payment Expired
+            </button>
+          </div>
 
           <div className="space-y-3" id="admin-vetting-list">
-            {businesses.map((biz) => {
+            {businesses
+              .filter((biz) => {
+                const searchLower = vendorSearch.toLowerCase();
+                if (vendorSearch && !biz.name.toLowerCase().includes(searchLower) && !biz.city.toLowerCase().includes(searchLower)) {
+                  return false;
+                }
+                
+                const today = new Date();
+                const expiry = new Date(biz.membershipExpiryDate);
+                const isExpiredDate = expiry < today;
+                
+                if (bizFilter === 'submissions') return !biz.isVerified && biz.status !== 'suspended';
+                if (bizFilter === 'active') return biz.status === 'active' && biz.isVerified;
+                if (bizFilter === 'pending') return biz.status === 'pending' && biz.isVerified;
+                if (bizFilter === 'expired') return (biz.status === 'suspended' || isExpiredDate) && biz.isVerified;
+                return true;
+              })
+              .map((biz) => {
               const isSuspended = biz.status === 'suspended';
               return (
                 <div key={biz.id} className="p-4 rounded-3xl bg-[#13110E] border border-[#2D2319] space-y-3.5">
@@ -194,43 +288,57 @@ export const AdminPanelTab: React.FC = () => {
 
                     <div className="text-right">
                       <span className={`px-2 py-0.5 rounded-full text-[8px] font-bold tracking-widest uppercase ${
-                        biz.status === 'active' ? 'bg-green-500/10 text-green-400' : 'bg-red-500/10 text-red-400'
+                        biz.status === 'active' ? 'bg-green-500/10 text-green-400' :
+                        biz.status === 'pending' ? 'bg-blue-500/10 text-blue-400' : 'bg-red-500/10 text-red-400'
                       }`}>
-                        {biz.status === 'active' ? 'ACTIVE' : 'SUSPENDED'}
+                        {biz.status.toUpperCase()}
                       </span>
                     </div>
                   </div>
 
                   {/* Actions area */}
+                  {/* Actions area */}
                   <div className="flex flex-wrap gap-2 pt-2 border-t border-[#2D2319]/45 justify-between items-center text-xs" id={`vet-actions-${biz.id}`}>
-                    <div className="flex gap-2">
-                      {/* Verification approval */}
-                      {!biz.isVerified ? (
-                        <button
-                          onClick={() => handleApproveVetting(biz)}
-                          className="px-3 py-1 rounded bg-green-600/15 text-green-300 hover:bg-green-600/25 border border-green-900/60 font-bold text-[10px]"
-                        >
-                          ✓ Grant Verified Badge
-                        </button>
-                      ) : (
-                        <span className="text-[10px] text-green-400 flex items-center gap-1 font-semibold">
-                          <CheckCircle className="w-3.5 h-3.5" /> Already Verified
-                        </span>
+                    <div className="flex gap-2 w-full justify-between">
+                      {/* Workflow Actions */}
+                      {bizFilter === 'submissions' && (
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => handleApproveVetting(biz)}
+                            className="px-3 py-1 rounded bg-green-600/15 text-green-300 hover:bg-green-600/25 border border-green-900/60 font-bold text-[10px] flex items-center gap-1"
+                          >
+                            <Check className="w-3 h-3" /> Approve
+                          </button>
+                          <button
+                            onClick={() => handleReject(biz)}
+                            className="px-3 py-1 rounded bg-red-600/15 text-red-300 hover:bg-red-600/25 border border-red-900/60 font-bold text-[10px] flex items-center gap-1"
+                          >
+                            <X className="w-3 h-3" /> Reject
+                          </button>
+                        </div>
                       )}
-                    </div>
+                      
+                      {bizFilter === 'pending' && (
+                        <button
+                          onClick={() => handleMarkAsPaid(biz)}
+                          className="px-3 py-1 rounded bg-[#FFA048]/20 text-[#FFA048] hover:bg-[#FFA048]/30 border border-[#FFA048]/50 font-bold text-[10px] flex items-center gap-1"
+                        >
+                          <DollarSign className="w-3 h-3" /> Mark as Paid
+                        </button>
+                      )}
 
-                    <div className="flex gap-1.5">
-                      {/* Expiry control toggle */}
-                      <button
-                        onClick={() => handleToggleStatus(biz)}
-                        className={`px-3 py-1 rounded text-[10px] font-bold ${
-                          isSuspended
-                            ? 'bg-amber-600 text-black hover:bg-amber-500'
-                            : 'bg-red-950/40 text-red-400 border border-red-900/40 hover:bg-red-950/80'
-                        }`}
-                      >
-                        {isSuspended ? '🔓 Re-Activate Listing' : '🔒 Terminate / Expire Status'}
-                      </button>
+                      {(bizFilter === 'active' || bizFilter === 'expired') && (
+                        <button
+                          onClick={() => handleToggleStatus(biz)}
+                          className={`px-3 py-1 rounded text-[10px] font-bold ${
+                            isSuspended
+                              ? 'bg-amber-600 text-black hover:bg-amber-500'
+                              : 'bg-red-950/40 text-red-400 border border-red-900/40 hover:bg-red-950/80'
+                          }`}
+                        >
+                          {isSuspended ? '🔓 Re-Activate Listing' : '🔒 Suspend Listing'}
+                        </button>
+                      )}
 
                       {/* Hard delete */}
                       <button

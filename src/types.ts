@@ -18,7 +18,7 @@ export interface Category {
   iconName: string; // Used to dynamically map Lucide icons
 }
 
-export type BusinessStatus = 'active' | 'suspended';
+export type BusinessStatus = 'active' | 'suspended' | 'pending';
 
 export interface Business {
   id: string;
@@ -30,7 +30,7 @@ export interface Business {
   categoryId: string;
   subcategory: { en: string; ar: string };
   address: string;
-  city: 'Baghdad' | 'Najaf' | 'Karbala' | 'Basra' | 'Erbil' | 'Diwaniyah' | 'Samarra';
+  city: 'New York' | 'Los Angeles' | 'Chicago' | 'Houston' | 'Miami' | 'Dearborn' | 'Dallas';
   area: string;
   isVerified: boolean;
   status: BusinessStatus;
@@ -69,4 +69,31 @@ export interface AppNotification {
   date: string;
   isRead: boolean;
   receiverRole: UserRole | 'all';
+}
+
+export interface Product {
+  id: string;
+  businessId: string;
+  name: { en: string; ar: string };
+  description: { en: string; ar: string };
+  price: number;
+  imageUrl: string;
+  inStock: boolean;
+}
+
+export interface OrderItem {
+  productId: string;
+  quantity: number;
+  priceAtPurchase: number;
+}
+
+export interface Order {
+  id: string;
+  businessId: string;
+  customerName: string;
+  customerPhone: string;
+  items: OrderItem[];
+  totalAmount: number;
+  status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
+  date: string;
 }

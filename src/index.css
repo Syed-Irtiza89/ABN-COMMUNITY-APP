@@ -16,6 +16,20 @@
   --font-ar: 'Cairo', sans-serif;
 }
 
+/* ─── Light Mode CSS Hack ─────────────────────────────────────── */
+/* The app uses hardcoded dark colors, so we use a filter to flip it! */
+html.light {
+  filter: invert(1) hue-rotate(180deg);
+  background-color: white; /* Inverted, it becomes black, but wait: if body is black, it becomes white */
+}
+
+/* Un-invert media elements and svgs so they look normal */
+html.light img,
+html.light video,
+html.light iframe {
+  filter: invert(1) hue-rotate(180deg);
+}
+
 /* ─── Base Reset & Typography ────────────────────────────────── */
 *, *::before, *::after {
   box-sizing: border-box;

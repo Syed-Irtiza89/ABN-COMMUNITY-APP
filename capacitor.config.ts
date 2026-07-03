@@ -2,7 +2,7 @@ import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
   appId: 'com.example.shiabusinessdirectory',
-  appName: 'Kawthar',
+  appName: 'ANV',
   webDir: 'dist',
   android: {
     // Allow the WebView to draw behind the status bar

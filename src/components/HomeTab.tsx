@@ -112,11 +112,11 @@ export const HomeTab: React.FC<HomeTabProps> = ({
 
   const CITY_KEYS = [
     { key: 'all', label: t.allCities },
-    { key: 'Baghdad', label: t.baghdad },
-    { key: 'Najaf', label: t.najaf },
-    { key: 'Karbala', label: t.karbala },
-    { key: 'Basra', label: t.basra },
-    { key: 'Erbil', label: t.erbil },
+    { key: 'New York', label: t.newyork },
+    { key: 'Los Angeles', label: t.losangeles },
+    { key: 'Chicago', label: t.chicago },
+    { key: 'Houston', label: t.houston },
+    { key: 'Miami', label: t.miami },
   ];
 
   // Unread notifications count
@@ -163,55 +163,14 @@ export const HomeTab: React.FC<HomeTabProps> = ({
   return (
     <div className="space-y-6" id="home-tab-container">
       
-      {/* Top Greeting Navigation Bar */}
-      <div className="flex items-center justify-between animate-fade-in-up" id="home-greeting-bar">
-        <div className="flex items-center gap-3">
-          <button
-            onClick={onOpenAuth}
-            className="w-12 h-12 rounded-full bg-gradient-to-br from-[#FFA048] to-[#D87D2E] hover:opacity-90 text-black font-extrabold text-lg flex items-center justify-center transition-transform active:scale-95 shadow-md border border-[#3A2E22]"
-            id="greeting-avatar-btn"
-          >
-            {currentUser ? currentUser.name.charAt(0).toUpperCase() : 'G'}
-          </button>
-          <div>
-            <span className="text-[10px] text-gray-500 block uppercase tracking-wider font-bold">
-              {currentUser ? currentUser.email : t.guestUser}
-            </span>
-            <span className="text-sm font-black text-[#F4E3D7]" id="greeting-title">
-              {currentUser ? `${t.visitorGreeting}, ${currentUser.name}` : `${t.visitorGreeting} / ${t.visitorSubtitle}`}
-            </span>
-          </div>
+      {/* Top Navigation Banner & Search */}
+      <div className="space-y-4 animate-fade-in-up" id="home-top-section">
+        {/* Header Context */}
+        <div className="pt-2">
+          <h1 className="text-3xl font-black text-[#FFA048] tracking-widest uppercase">AVN</h1>
         </div>
 
-        {/* Notifications Icon trigger */}
-        <button
-          onClick={() => onSwitchTab('account')}
-          className="relative w-10 h-10 rounded-full bg-[#191613] hover:bg-[#2A231C] border border-[#2D2319] flex items-center justify-center text-[#FFA048] transition-colors"
-          id="btn-home-notif"
-        >
-          <Bell className="w-5 h-5" />
-          {unreadCount > 0 && (
-            <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-red-500 rounded-full border border-[#191613] animate-pulse"></span>
-          )}
-        </button>
-      </div>
-
-      {/* Hero Header Presentation Banner */}
-      <div className="p-6 rounded-3xl bg-gradient-to-br from-[#1F140C] via-[#160E08] to-[#0A0705] border border-[#2D2319] relative overflow-hidden animate-fade-in-up" style={{animationDelay:'0.05s'}} id="home-hero-banner">
-        {/* Decorative glow */}
-        <div className="absolute top-0 right-0 w-48 h-48 bg-[#FFA048]/8 rounded-full blur-3xl pointer-events-none"></div>
-        <div className="absolute bottom-0 left-0 w-32 h-32 bg-[#FFA048]/4 rounded-full blur-2xl pointer-events-none"></div>
-        
-        <h2 className="text-xl md:text-2xl font-black text-[#F4E3D7] leading-tight max-w-sm mb-2" id="hero-title">
-          {language === 'en' ? 'Find trusted ' : 'ابحث عن '}
-          <span className="text-[#FFA048]">{language === 'en' ? 'Shia-owned' : 'مقدمي الخدمات الشيعة'}</span>
-          {language === 'en' ? ' businesses near you' : ' الموثوقين القريبين منك'}
-        </h2>
-        <p className="text-xs text-gray-400 font-sans max-w-xs mb-5 leading-normal">
-          {t.subTagline}
-        </p>
-
-        {/* Home search bar */}
+        {/* Search Bar (Relocated) */}
         <form onSubmit={handleSearchSubmit} className="relative flex items-center" id="home-search-form">
           <div className="relative w-full">
             <Search className="absolute left-3.5 top-3.5 w-4 h-4 text-gray-500" />
@@ -225,19 +184,18 @@ export const HomeTab: React.FC<HomeTabProps> = ({
             />
           </div>
 
-          {/* Location badge */}
           <button
             type="button"
             onClick={() => {
-              setInputSearch('Baghdad');
-              setSearchQueryText('Baghdad');
+              setInputSearch('New York');
+              setSearchQueryText('New York');
               onSwitchTab('search');
             }}
             className="absolute right-2 px-2.5 py-1.5 rounded-xl bg-[#201B15] text-[#FFA048] font-bold text-[10px] border border-[#3A2F22] flex items-center gap-1 hover:bg-[#2D251C] transition-colors"
             id="home-location-badge-btn"
           >
             <MapPin className="w-3 h-3 text-[#FFA048]" />
-            {t.baghdad}
+            {t.newyork}
           </button>
         </form>
       </div>
@@ -306,73 +264,21 @@ export const HomeTab: React.FC<HomeTabProps> = ({
         </div>
       </div>
 
-      {/* Featured Businesses Section */}
-      <div className="space-y-3 animate-fade-in-up" style={{animationDelay:'0.15s'}} id="home-featured-block">
-        <div className="flex items-center justify-between">
-          <h3 className="text-sm font-extrabold text-[#F4E3D7] uppercase tracking-medium">
-            {t.featured}
-          </h3>
-          <span className="p-1 px-2 rounded-full text-[8px] bg-[#1A1612] text-[#FFA048] font-extrabold border border-[#2D2319]/80 flex items-center gap-1">
-            <Sparkles className="w-2.5 h-2.5" /> Premium
-          </span>
-        </div>
 
-        <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-none" id="home-featured-scroll">
-          {featuredBusinesses.map((biz) => {
-            const isOpen = isBusinessOpenNow(biz.workingHours.en);
-            return (
-              <div
-                key={biz.id}
-                onClick={() => onSelectBusiness(biz)}
-                className="flex-shrink-0 w-64 rounded-3xl overflow-hidden bg-[#13110E] border border-[#2D2319] hover:border-[#FFA048]/40 transition-all cursor-pointer group card-hover"
-                id={`featured-card-${biz.id}`}
-              >
-                {/* Cover image area */}
-                <div className="relative h-28 bg-[#1A1612] overflow-hidden">
-                  <img
-                    src={biz.coverUrl}
-                    alt={biz.name}
-                    loading="lazy"
-                    className="w-full h-full object-cover group-hover:scale-[1.04] transition-transform duration-500"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80&w=400&h=300';
-                    }}
-                  />
-                  {/* Dark gradient overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
-                  <span className="absolute top-2.5 left-2.5 px-2 py-0.5 rounded-md text-[8px] uppercase tracking-wider font-extrabold bg-black/75 text-[#FFA048] border border-[#2D2319]/40">
-                    {biz.subcategory[language] || biz.subcategory.en}
-                  </span>
-                  <span className="absolute bottom-2 right-2.5 px-1.5 py-0.5 rounded text-[8px] font-bold bg-[#FFA048] text-black">
-                    ★ {biz.rating}
-                  </span>
-                  {/* Open/Closed Badge */}
-                  {isOpen !== null && (
-                    <span className={`absolute top-2.5 right-2.5 px-1.5 py-0.5 rounded text-[8px] font-extrabold uppercase ${isOpen ? 'badge-open' : 'badge-closed'}`}>
-                      {isOpen ? 'Open' : 'Closed'}
-                    </span>
-                  )}
-                </div>
-                {/* Text Info */}
-                <div className="p-3.5 space-y-1.5">
-                  <h4 className="text-xs font-black text-white group-hover:text-[#FFA048] transition-colors leading-snug">
-                    {biz.name}
-                  </h4>
-                  <div className="flex items-center justify-between text-[9px] text-gray-500">
-                    <span className="flex items-center gap-0.5">
-                      <MapPin className="w-3.5 h-3.5 text-[#FFA048]" />
-                      {t[biz.city.toLowerCase() as 'baghdad' | 'najaf' | 'karbala']}
-                    </span>
-                    <span className="flex items-center gap-0.5">
-                      <Clock className="w-3 h-3 text-gray-600" />
-                      {biz.area}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
+
+      {/* Register Banner */}
+      <div className="animate-fade-in-up" style={{animationDelay:'0.15s'}}>
+        <button
+          onClick={() => onSwitchTab('business')}
+          className="w-full p-4 rounded-3xl bg-gradient-to-r from-[#FFA048] to-[#D87D2E] text-black shadow-lg hover:shadow-xl transition-all active:scale-95 flex items-center justify-between"
+          id="btn-register-banner"
+        >
+          <div className="text-left">
+            <h2 className="text-lg font-black">{language === 'en' ? 'Register as a Business' : 'سجل كصاحب عمل'}</h2>
+            <p className="text-xs font-semibold opacity-80">{language === 'en' ? 'Join the community directory today' : 'انضم لدليل المجتمع اليوم'}</p>
+          </div>
+          <ArrowRight className="w-6 h-6" />
+        </button>
       </div>
 
       {/* All listings directory strip */}
@@ -427,7 +333,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({
                   </p>
                   <span className="text-[9px] text-gray-500 flex items-center gap-0.5 mt-1">
                     <MapPin className="w-3 h-3 text-[#FFA048]" />
-                    {t[biz.city.toLowerCase() as 'baghdad' | 'najaf' | 'karbala']} ({biz.area})
+                    {t[biz.city.replace(/\\s+/g, '').toLowerCase() as 'newyork' | 'losangeles' | 'chicago']} ({biz.area})
                   </span>
                 </div>
 

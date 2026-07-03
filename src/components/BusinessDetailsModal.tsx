@@ -108,7 +108,7 @@ export const BusinessDetailsModal: React.FC<BusinessDetailsModalProps> = ({ busi
       window.open(url, '_blank');
     } else if (actionType === 'maps') {
       // Open Google Maps with the business address
-      const query = encodeURIComponent(`${business.name}, ${business.address}, ${business.city}, Iraq`);
+      const query = encodeURIComponent(`${business.name}, ${business.address}, ${business.city}, USA`);
       window.open(`https://www.google.com/maps/search/?api=1&query=${query}`, '_blank');
     }
   };
@@ -470,7 +470,7 @@ export const BusinessDetailsModal: React.FC<BusinessDetailsModalProps> = ({ busi
                   <circle cx="50" cy="45" r="10" stroke="#FFA048" strokeWidth="1" opacity="0.5" className="animate-ping" />
                 </svg>
                 <div className="absolute inset-x-0 bottom-0 bg-[#0F0E0C]/90 p-2 text-[9px] text-[#FFA048] flex items-center justify-between border-t border-[#2D2319]">
-                  <span className="font-mono">{business.city}, Iraq</span>
+                  <span className="font-mono">{business.city}, USA</span>
                   <span className="font-bold underline cursor-pointer">{language === 'en' ? 'EXPAND' : 'تكبير'}</span>
                 </div>
               </div>

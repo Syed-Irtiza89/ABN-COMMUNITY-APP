@@ -1,11 +1,13 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { UserProfile, Business, Category, Review, PaymentRecord, AppNotification, UserRole } from '../types';
-import { INITIAL_CATEGORIES, INITIAL_BUSINESSES, INITIAL_REVIEWS, INITIAL_PAYMENTS } from '../data/mockData';
+import { UserProfile, Business, Category, Review, PaymentRecord, AppNotification, UserRole, Product, Order } from '../types';
+import { INITIAL_CATEGORIES, INITIAL_BUSINESSES, INITIAL_REVIEWS, INITIAL_PAYMENTS, INITIAL_PRODUCTS, INITIAL_ORDERS } from '../data/mockData';
 
 interface DirectoryContextType {
   currentUser: UserProfile | null;
-  language: 'en' | 'ar';
-  setLanguage: (lang: 'en' | 'ar') => void;
+  language: 'en' | 'ar' | 'fa';
+  setLanguage: (lang: 'en' | 'ar' | 'fa') => void;
+  theme: 'light' | 'dark' | 'system';
+  setTheme: (t: 'light' | 'dark' | 'system') => void;
   categories: Category[];
   addCategory: (category: Category) => void;
   removeCategory: (id: string) => void;
@@ -19,6 +21,10 @@ interface DirectoryContextType {
   toggleFavorite: (businessId: string) => void;
   payments: PaymentRecord[];
   addPayment: (payment: PaymentRecord) => void;
+  products: Product[];
+  addProduct: (product: Product) => void;
+  orders: Order[];
+  updateOrderStatus: (id: string, status: Order['status']) => void;
   notifications: AppNotification[];
   addNotification: (title: string, message: string, receiverRole: UserRole | 'all') => void;
   markNotificationsAsRead: () => void;
@@ -38,9 +44,14 @@ export const DirectoryProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     return null;
   });
 
-  const [language, setLanguageState] = useState<'en' | 'ar'>(() => {
+  const [language, setLanguageState] = useState<'en' | 'ar' | 'fa'>(() => {
     const saved = localStorage.getItem('shia_dir_lang');
-    return (saved as 'en' | 'ar') || 'en';
+    return (saved as 'en' | 'ar' | 'fa') || 'en';
+  });
+
+  const [theme, setThemeState] = useState<'light' | 'dark' | 'system'>(() => {
+    const saved = localStorage.getItem('shia_dir_theme');
+    return (saved as 'light' | 'dark' | 'system') || 'system';
   });
 
   const [categories, setCategories] = useState<Category[]>(() => {
@@ -143,6 +154,22 @@ export const DirectoryProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     return INITIAL_PAYMENTS;
   });
 
+  const [products, setProducts] = useState<Product[]>(() => {
+    try {
+      const saved = localStorage.getItem('shia_dir_products');
+      if (saved) return JSON.parse(saved);
+    } catch { localStorage.removeItem('shia_dir_products'); }
+    return INITIAL_PRODUCTS;
+  });
+
+  const [orders, setOrders] = useState<Order[]>(() => {
+    try {
+      const saved = localStorage.getItem('shia_dir_orders');
+      if (saved) return JSON.parse(saved);
+    } catch { localStorage.removeItem('shia_dir_orders'); }
+    return INITIAL_ORDERS;
+  });
+
   const [notifications, setNotifications] = useState<AppNotification[]>(() => {
     try {
       const saved = localStorage.getItem('shia_dir_notifications');
@@ -170,6 +197,22 @@ export const DirectoryProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   }, [language]);
 
   useEffect(() => {
+    localStorage.setItem('shia_dir_theme', theme);
+  }, [theme]);
+
+  useEffect(() => {
+    const root = window.document.documentElement;
+    root.classList.remove('light', 'dark');
+
+    if (theme === 'system') {
+      const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      root.classList.add(systemTheme);
+    } else {
+      root.classList.add(theme);
+    }
+  }, [theme]);
+
+  useEffect(() => {
     localStorage.setItem('shia_dir_categories', JSON.stringify(categories));
   }, [categories]);
 
@@ -193,7 +236,8 @@ export const DirectoryProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     localStorage.setItem('shia_dir_notifications', JSON.stringify(notifications));
   }, [notifications]);
 
-  const setLanguage = (lang: 'en' | 'ar') => setLanguageState(lang);
+  const setLanguage = (lang: 'en' | 'ar' | 'fa') => setLanguageState(lang);
+  const setTheme = (t: 'light' | 'dark' | 'system') => setThemeState(t);
 
   const addCategory = (cat: Category) => {
     setCategories((prev) => [...prev, cat]);
@@ -243,7 +287,11 @@ export const DirectoryProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   };
 
   const addPayment = (payment: PaymentRecord) => {
-    setPayments((prev) => [payment, ...prev]);
+    setPayments((prev) => {
+      const nw = [payment, ...prev];
+      localStorage.setItem('shia_dir_payments', JSON.stringify(nw));
+      return nw;
+    });
     // Update business subscription status and expiry
     setBusinesses((prev_list) => {
       return prev_list.map((biz) => {
@@ -271,6 +319,23 @@ export const DirectoryProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       );
     }
   };
+
+  const addProduct = (product: Product) => {
+    setProducts((prev) => {
+      const nw = [product, ...prev];
+      localStorage.setItem('shia_dir_products', JSON.stringify(nw));
+      return nw;
+    });
+  };
+
+  const updateOrderStatus = (id: string, status: Order['status']) => {
+    setOrders((prev) => {
+      const nw = prev.map(o => o.id === id ? { ...o, status } : o);
+      localStorage.setItem('shia_dir_orders', JSON.stringify(nw));
+      return nw;
+    });
+  };
+
 
   const addNotification = (title: string, message: string, receiverRole: UserRole | 'all') => {
     const newNotif: AppNotification = {
@@ -319,6 +384,8 @@ export const DirectoryProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         currentUser,
         language,
         setLanguage,
+        theme,
+        setTheme,
         categories,
         addCategory,
         removeCategory,
@@ -332,6 +399,10 @@ export const DirectoryProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         toggleFavorite,
         payments,
         addPayment,
+        products,
+        addProduct,
+        orders,
+        updateOrderStatus,
         notifications,
         addNotification,
         markNotificationsAsRead,

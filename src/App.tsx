@@ -6,7 +6,10 @@ import { BusinessDetailsModal } from './components/BusinessDetailsModal';
 import { HomeTab } from './components/HomeTab';
 import { SearchTab } from './components/SearchTab';
 import { SavedTab } from './components/SavedTab';
-import { BusinessPortalTab } from './components/BusinessPortalTab';
+
+import { BusinessInventoryTab } from './components/BusinessInventoryTab';
+import { BusinessOrdersTab } from './components/BusinessOrdersTab';
+import { BusinessProfitLossTab } from './components/BusinessProfitLossTab';
 import { AccountTab } from './components/AccountTab';
 import { AdminPanelTab } from './components/AdminPanelTab';
 import { Business } from './types';
@@ -17,6 +20,9 @@ import {
   Briefcase,
   User,
   Shield,
+  Package,
+  ShoppingBag,
+  TrendingUp,
   Smartphone,
   Info,
 } from 'lucide-react';
@@ -101,7 +107,17 @@ function TabContent({
       )}
       {activeTab === 'business' && (
         <TabView tabKey="business">
-          <BusinessPortalTab onOpenAuth={() => setIsAuthOpen(true)} />
+          <BusinessInventoryTab />
+        </TabView>
+      )}
+      {activeTab === 'orders' && (
+        <TabView tabKey="orders">
+          <BusinessOrdersTab />
+        </TabView>
+      )}
+      {activeTab === 'profitloss' && (
+        <TabView tabKey="profitloss">
+          <BusinessProfitLossTab />
         </TabView>
       )}
       {activeTab === 'account' && (
@@ -132,46 +148,83 @@ function BottomNav({
   setActiveTab,
   setSearchQueryText,
   t,
+  isAdmin,
+  isBusiness,
 }: {
   activeTab: string;
   setActiveTab: (t: string) => void;
   setSearchQueryText: (q: string) => void;
   t: Record<string, string>;
+  isAdmin?: boolean;
+  isBusiness?: boolean;
 }) {
   return (
     <nav className="flex justify-between items-center h-full px-2">
-      <button
-        onClick={() => { setSearchQueryText(''); setActiveTab('home'); }}
-        className={`flex flex-col items-center justify-center flex-1 py-2 transition-all ${activeTab === 'home' ? 'text-[#FFA048] scale-110 font-black' : 'text-gray-500 hover:text-white'}`}
-        id="tab-btn-home"
-      >
-        <Home className="w-5 h-5 mb-0.5" />
-        <span className="text-[9px] tracking-tight">{t.home}</span>
-      </button>
-      <button
-        onClick={() => setActiveTab('search')}
-        className={`flex flex-col items-center justify-center flex-1 py-2 transition-all ${activeTab === 'search' ? 'text-[#FFA048] scale-110 font-black' : 'text-gray-500 hover:text-white'}`}
-        id="tab-btn-search"
-      >
-        <Search className="w-5 h-5 mb-0.5" />
-        <span className="text-[9px] tracking-tight">{t.search}</span>
-      </button>
-      <button
-        onClick={() => setActiveTab('saved')}
-        className={`flex flex-col items-center justify-center flex-1 py-2 transition-all ${activeTab === 'saved' ? 'text-[#FFA048] scale-110 font-black' : 'text-gray-500 hover:text-white'}`}
-        id="tab-btn-saved"
-      >
-        <Heart className="w-5 h-5 mb-0.5" />
-        <span className="text-[9px] tracking-tight">{t.saved}</span>
-      </button>
-      <button
-        onClick={() => setActiveTab('business')}
-        className={`flex flex-col items-center justify-center flex-1 py-2 transition-all ${activeTab === 'business' ? 'text-[#FFA048] scale-110 font-black' : 'text-gray-500 hover:text-white'}`}
-        id="tab-btn-business"
-      >
-        <Briefcase className="w-5 h-5 mb-0.5" />
-        <span className="text-[9px] tracking-tight">{t.business}</span>
-      </button>
+      {(!isAdmin && !isBusiness) && (
+        <>
+          <button
+            onClick={() => { setSearchQueryText(''); setActiveTab('home'); }}
+            className={`flex flex-col items-center justify-center flex-1 py-2 transition-all ${activeTab === 'home' ? 'text-[#FFA048] scale-110 font-black' : 'text-gray-500 hover:text-white'}`}
+            id="tab-btn-home"
+          >
+            <Home className="w-5 h-5 mb-0.5" />
+            <span className="text-[9px] tracking-tight">{t.home}</span>
+          </button>
+          <button
+            onClick={() => setActiveTab('search')}
+            className={`flex flex-col items-center justify-center flex-1 py-2 transition-all ${activeTab === 'search' ? 'text-[#FFA048] scale-110 font-black' : 'text-gray-500 hover:text-white'}`}
+            id="tab-btn-search"
+          >
+            <Search className="w-5 h-5 mb-0.5" />
+            <span className="text-[9px] tracking-tight">{t.search}</span>
+          </button>
+          <button
+            onClick={() => setActiveTab('saved')}
+            className={`flex flex-col items-center justify-center flex-1 py-2 transition-all ${activeTab === 'saved' ? 'text-[#FFA048] scale-110 font-black' : 'text-gray-500 hover:text-white'}`}
+            id="tab-btn-saved"
+          >
+            <Heart className="w-5 h-5 mb-0.5" />
+            <span className="text-[9px] tracking-tight">{t.saved}</span>
+          </button>
+        </>
+      )}
+
+      {isBusiness && (
+        <>
+          <button
+            onClick={() => setActiveTab('business')}
+            className={`flex flex-col items-center justify-center flex-1 py-2 transition-all ${activeTab === 'business' ? 'text-[#FFA048] scale-110 font-black' : 'text-gray-500 hover:text-white'}`}
+          >
+            <Package className="w-5 h-5 mb-0.5" />
+            <span className="text-[9px] tracking-tight">Home</span>
+          </button>
+          <button
+            onClick={() => setActiveTab('orders')}
+            className={`flex flex-col items-center justify-center flex-1 py-2 transition-all ${activeTab === 'orders' ? 'text-[#FFA048] scale-110 font-black' : 'text-gray-500 hover:text-white'}`}
+          >
+            <ShoppingBag className="w-5 h-5 mb-0.5" />
+            <span className="text-[9px] tracking-tight">Orders</span>
+          </button>
+          <button
+            onClick={() => setActiveTab('profitloss')}
+            className={`flex flex-col items-center justify-center flex-1 py-2 transition-all ${activeTab === 'profitloss' ? 'text-[#FFA048] scale-110 font-black' : 'text-gray-500 hover:text-white'}`}
+          >
+            <TrendingUp className="w-5 h-5 mb-0.5" />
+            <span className="text-[9px] tracking-tight">P&L</span>
+          </button>
+        </>
+      )}
+
+      {isAdmin && (
+        <button
+          onClick={() => setActiveTab('admin')}
+          className={`flex flex-col items-center justify-center flex-1 py-2 transition-all ${activeTab === 'admin' ? 'text-[#FFA048] scale-110 font-black' : 'text-gray-500 hover:text-white'}`}
+          id="tab-btn-admin"
+        >
+          <Shield className="w-5 h-5 mb-0.5" />
+          <span className="text-[9px] tracking-tight">{t.adminPanel || 'Admin'}</span>
+        </button>
+      )}
       <button
         onClick={() => setActiveTab('account')}
         className={`flex flex-col items-center justify-center flex-1 py-2 transition-all ${activeTab === 'account' || activeTab === 'admin' ? 'text-[#FFA048] scale-110 font-black' : 'text-gray-500 hover:text-white'}`}
@@ -203,11 +256,11 @@ function DirectoryAppContent() {
 
   const handleSandboxLogin = (profile: 'cust' | 'owner' | 'admin') => {
     if (profile === 'cust') {
-      signIn('manimuhammad000@gmail.com', '+964 770 111 2222', 'customer', 'Mani Muhammad');
+      signIn('manimuhammad000@gmail.com', '+1 770 111 2222', 'customer', 'Mani Muhammad');
     } else if (profile === 'owner') {
-      signIn('owner-alkawthar@gmail.com', '+964 770 123 4567', 'business', 'Hassan Al-Kawthar');
+      signIn('owner-alkawthar@gmail.com', '+1 770 123 4567', 'business', 'Hassan Al-Kawthar');
     } else {
-      signIn('admin@shiadirectory.com', '+964 780 000 0000', 'admin', 'Abu Murtadha (Admin)');
+      signIn('admin@shiadirectory.com', '+1 780 000 0000', 'admin', 'Abu Murtadha (Admin)');
     }
   };
 
@@ -239,12 +292,16 @@ function DirectoryAppContent() {
           className="flex-shrink-0 bg-[#0A0705]/80 backdrop-blur-md border-t border-[#2D2319] z-30"
           style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
         >
-          <BottomNav
-            activeTab={activeTab}
-            setActiveTab={setActiveTab}
-            setSearchQueryText={setSearchQueryText}
-            t={t as unknown as Record<string, string>}
-          />
+          <div className="h-14">
+            <BottomNav
+              activeTab={activeTab}
+              setActiveTab={setActiveTab}
+              setSearchQueryText={setSearchQueryText}
+              t={t as unknown as Record<string, string>}
+              isAdmin={currentUser?.role === 'admin'}
+              isBusiness={currentUser?.role === 'business'}
+            />
+          </div>
         </div>
 
         {/* Global Modals */}
@@ -327,12 +384,14 @@ function DirectoryAppContent() {
 
             {/* Simulator Bottom Navigation Bar */}
             <div className="absolute bottom-0 inset-x-0 h-16 bg-[#0A0705]/80 backdrop-blur-xl border-t border-[#2D2319] rounded-b-[42px] z-30 shadow-[0_-4px_30px_rgba(0,0,0,0.5)]">
-              <BottomNav
-                activeTab={activeTab}
-                setActiveTab={setActiveTab}
-                setSearchQueryText={setSearchQueryText}
-                t={t as unknown as Record<string, string>}
-              />
+                  <BottomNav
+                    activeTab={activeTab}
+                    setActiveTab={setActiveTab}
+                    setSearchQueryText={setSearchQueryText}
+                    t={t as unknown as Record<string, string>}
+                    isAdmin={currentUser?.role === 'admin'}
+                    isBusiness={currentUser?.role === 'business'}
+                  />
             </div>
 
             {/* Home indicator bar */}
@@ -424,10 +483,59 @@ function DirectoryAppContent() {
   );
 }
 
+interface ErrorBoundaryProps {
+  children: React.ReactNode;
+}
+
+interface ErrorBoundaryState {
+  hasError: boolean;
+  error: Error | null;
+}
+
+class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
+  public state: ErrorBoundaryState = { hasError: false, error: null };
+  public props: ErrorBoundaryProps;
+
+  constructor(props: ErrorBoundaryProps) {
+    super(props);
+    this.props = props;
+  }
+
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, error };
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="min-h-screen bg-[#0A0705] flex flex-col items-center justify-center text-white p-6">
+          <Shield className="w-16 h-16 text-red-500 mb-4" />
+          <h1 className="text-2xl font-bold mb-2 text-red-400">Application Error</h1>
+          <p className="text-sm text-gray-400 text-center max-w-md mb-4">
+            A rendering error occurred in the application structure.
+          </p>
+          <pre className="bg-[#191512] p-4 rounded-xl text-xs text-red-300 max-w-full overflow-x-auto">
+            {this.state.error?.toString()}
+          </pre>
+          <button 
+            onClick={() => window.location.reload()} 
+            className="mt-6 px-6 py-2 bg-[#FFA048] text-black font-bold rounded-lg hover:bg-amber-400"
+          >
+            Reload Application
+          </button>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
 export default function App() {
   return (
-    <DirectoryProvider>
-      <DirectoryAppContent />
-    </DirectoryProvider>
+    <ErrorBoundary>
+      <DirectoryProvider>
+        <DirectoryAppContent />
+      </DirectoryProvider>
+    </ErrorBoundary>
   );
 }

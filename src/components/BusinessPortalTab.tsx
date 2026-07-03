@@ -19,7 +19,8 @@ import {
   UserCheck,
   CheckCircle,
   Lock,
-  Edit
+  Edit,
+  ArrowRight
 } from 'lucide-react';
 import { Business, PaymentRecord } from '../types';
 
@@ -45,6 +46,9 @@ export const BusinessPortalTab: React.FC<BusinessPortalTabProps> = ({ onOpenAuth
 
   // Find business registered to current owner
   const myBusiness = businesses.find((b) => b.ownerId === (currentUser?.id || ''));
+
+  // Registration Flow State
+  const [registrationType, setRegistrationType] = useState<'business' | 'service' | null>(null);
 
   // Registration Form State
   const [regName, setRegName] = useState('');
@@ -190,7 +194,8 @@ export const BusinessPortalTab: React.FC<BusinessPortalTabProps> = ({ onOpenAuth
       membershipExpiryDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
       gallery: [defaultCover],
       rating: 5.0,
-      reviewsCount: 0
+      reviewsCount: 0,
+      // Add custom field or logic to differentiate type? We'll just stick to standard Business for now.
     };
 
     addBusiness(newBiz);
@@ -400,14 +405,78 @@ export const BusinessPortalTab: React.FC<BusinessPortalTabProps> = ({ onOpenAuth
       
       {/* NO REGISTERED BUSINESS: DISPLAY APPLICANT FORM */}
       {!myBusiness ? (
-        <div className="space-y-4" id="portal-registration-form-section">
-          <div className="pb-1 border-b border-[#2D2319]">
-            <h2 className="text-xl font-extrabold text-[#F4E3D7]">
-              {t.registerBusiness}
-            </h2>
-            <p className="text-[10px] text-gray-500 font-medium">
-              {language === 'en' ? 'Reach Shia community customers directly for $50/month.' : 'انضم لدليل أعمال المجتمع وتواصل مع آلاف الزبائن بقيمة 50$ شهرياً.'}
-            </p>
+        !registrationType ? (
+          <div className="space-y-4 animate-fade-in-up" id="portal-registration-selection">
+            <div className="pb-1 border-b border-[#2D2319]">
+              <h2 className="text-xl font-extrabold text-[#F4E3D7]">
+                {language === 'en' ? 'Choose Registration Type' : 'اختر نوع التسجيل'}
+              </h2>
+              <p className="text-[10px] text-gray-500 font-medium">
+                {language === 'en' ? 'Select how you want to join the community directory.' : 'اختر كيف تريد الانضمام إلى دليل المجتمع.'}
+              </p>
+            </div>
+            
+            <div className="grid grid-cols-1 gap-4 mt-4">
+              <button
+                onClick={() => setRegistrationType('business')}
+                className="p-5 rounded-3xl bg-[#13110E] border border-[#2D2319] hover:border-[#FFA048] transition-all flex flex-col text-left space-y-2 group shadow-sm active:scale-95"
+              >
+                <div className="flex items-center justify-between w-full">
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="w-10 h-10 rounded-2xl bg-[#FFA048]/10 flex items-center justify-center border border-[#FFA048]/30 group-hover:scale-105 transition-transform">
+                      <Briefcase className="w-5 h-5 text-[#FFA048]" />
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-black text-white">{language === 'en' ? 'Register as a Business' : 'سجل كصاحب عمل'}</h3>
+                      <span className="text-[10px] font-bold text-[#FFA048] bg-[#FFA048]/10 px-2 py-0.5 rounded-md mt-1 inline-block border border-[#FFA048]/20">$50 / month</span>
+                    </div>
+                  </div>
+                  <ArrowRight className="w-5 h-5 text-gray-600 group-hover:text-[#FFA048] transition-colors" />
+                </div>
+                <p className="text-[10px] text-gray-400 mt-2 ml-[52px]">
+                  {language === 'en' ? 'Best for shops, restaurants, and physical store locations.' : 'الأفضل للمتاجر والمطاعم والمواقع التجارية الفعلية.'}
+                </p>
+              </button>
+
+              <button
+                onClick={() => setRegistrationType('service')}
+                className="p-5 rounded-3xl bg-[#13110E] border border-[#2D2319] hover:border-blue-500 transition-all flex flex-col text-left space-y-2 group shadow-sm active:scale-95"
+              >
+                <div className="flex items-center justify-between w-full">
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="w-10 h-10 rounded-2xl bg-blue-500/10 flex items-center justify-center border border-blue-500/30 group-hover:scale-105 transition-transform">
+                      <UserCheck className="w-5 h-5 text-blue-400" />
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-black text-white">{language === 'en' ? 'Register as a Service Provider' : 'سجل كمقدم خدمة'}</h3>
+                      <span className="text-[10px] font-bold text-blue-400 bg-blue-500/10 px-2 py-0.5 rounded-md mt-1 inline-block border border-blue-500/20">$30 / month</span>
+                    </div>
+                  </div>
+                  <ArrowRight className="w-5 h-5 text-gray-600 group-hover:text-blue-400 transition-colors" />
+                </div>
+                <p className="text-[10px] text-gray-400 mt-2 ml-[52px]">
+                  {language === 'en' ? 'Best for independent professionals, plumbers, and freelancers.' : 'الأفضل للمهنيين المستقلين والحرفيين.'}
+                </p>
+              </button>
+            </div>
+          </div>
+        ) : (
+        <div className="space-y-4 animate-fade-in" id="portal-registration-form-section">
+          <div className="flex items-center gap-3 pb-1 border-b border-[#2D2319]">
+            <button 
+              onClick={() => setRegistrationType(null)} 
+              className="p-1.5 rounded-full bg-[#191613] hover:bg-[#2D251C] transition-colors border border-[#2D2319]"
+            >
+              <ArrowRight className="w-4 h-4 text-gray-400 rotate-180" />
+            </button>
+            <div>
+              <h2 className="text-xl font-extrabold text-[#F4E3D7]">
+                {registrationType === 'business' ? t.registerBusiness : (language === 'en' ? 'Register Service' : 'سجل كخدمة')}
+              </h2>
+              <p className="text-[10px] text-gray-500 font-medium">
+                {language === 'en' ? `Reach Shia community customers directly for $${registrationType === 'business' ? '50' : '30'}/month.` : `انضم لدليل أعمال المجتمع وتواصل مع آلاف الزبائن بقيمة ${registrationType === 'business' ? '50$' : '30$'} شهرياً.`}
+              </p>
+            </div>
           </div>
 
           <form onSubmit={handleRegisterSubmit} className="space-y-4 p-5 rounded-3xl bg-[#13110E] border border-[#2D2319]" id="biz-reg-form">
@@ -587,6 +656,7 @@ export const BusinessPortalTab: React.FC<BusinessPortalTabProps> = ({ onOpenAuth
             </button>
           </form>
         </div>
+        )
       ) : (
         
         /* BUSINESS REGISTERED: DISPLAY DASHBOARD CONSOLE */

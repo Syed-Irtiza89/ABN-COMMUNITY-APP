@@ -24,8 +24,11 @@ export const AccountTab: React.FC<AccountTabProps> = ({ onOpenAuth, onSwitchTab 
   const {
     language,
     setLanguage,
+    theme,
+    setTheme,
     currentUser,
     signOut,
+    businesses,
     notifications,
     markNotificationsAsRead,
     clearNotifications
@@ -45,6 +48,8 @@ export const AccountTab: React.FC<AccountTabProps> = ({ onOpenAuth, onSwitchTab 
     setShowNotificationsModal(true);
     markNotificationsAsRead();
   };
+
+  const myBusiness = currentUser?.role === 'business' ? businesses.find(b => b.ownerId === currentUser.id) : null;
 
   return (
     <div className="space-y-6" id="account-tab-container">
@@ -80,23 +85,57 @@ export const AccountTab: React.FC<AccountTabProps> = ({ onOpenAuth, onSwitchTab 
         </div>
       ) : (
         /* SIGNED IN USER CARD representation (Screenshot #5) */
-        <div className="p-4.5 rounded-3xl bg-[#13110E] border border-[#2D2319] flex items-center justify-between gap-3" id="signedin-profile-card">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-full bg-[#FFA048] text-black font-extrabold flex items-center justify-center border border-[#3A2E22]">
-              {currentUser.name.charAt(0).toUpperCase()}
+        <div className="flex flex-col gap-4">
+          <div className="p-4.5 rounded-3xl bg-[#13110E] border border-[#2D2319] flex items-center justify-between gap-3" id="signedin-profile-card">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-full bg-[#FFA048] text-black font-extrabold flex items-center justify-center border border-[#3A2E22]">
+                {currentUser.name.charAt(0).toUpperCase()}
+              </div>
+              <div className="min-w-0 flex-1">
+                <h3 className="text-xs font-black text-white truncate max-w-[160px]">{currentUser.email}</h3>
+                <div className="flex items-center gap-2 mt-0.5">
+                  <span className="text-[9px] text-green-400 font-bold block">Signed in ({currentUser.role})</span>
+                </div>
+              </div>
             </div>
-            <div className="min-w-0 flex-1">
-              <h3 className="text-xs font-black text-white truncate max-w-[160px]">{currentUser.email}</h3>
-              <span className="text-[9px] text-green-400 font-bold block mt-0.5">Signed in ({currentUser.role})</span>
-            </div>
+            <button
+              onClick={signOut}
+              className="px-4 py-1.5 rounded-full bg-[#201B15] text-[#FFA048] border border-[#3A2E22] hover:bg-[#2D2319] text-[10px] font-black tracking-tight transition-all"
+              id="signedin-btn-signout"
+            >
+              Sign out
+            </button>
           </div>
-          <button
-            onClick={signOut}
-            className="px-4 py-1.5 rounded-full bg-[#201B15] text-[#FFA048] border border-[#3A2E22] hover:bg-[#2D2319] text-[10px] font-black tracking-tight transition-all"
-            id="signedin-btn-signout"
-          >
-            Sign out
-          </button>
+          
+          {/* Active Business Metadata */}
+          {myBusiness && (
+            <div className="p-4 rounded-3xl bg-[#13110E] border border-[#2D2319] space-y-3 shadow-sm">
+              <div className="flex items-center gap-2 mb-1">
+                <Briefcase className="w-4 h-4 text-[#FFA048]" />
+                <h4 className="text-xs font-black text-white">Business Profile Metadata</h4>
+              </div>
+              <div className="grid grid-cols-2 gap-3 text-[10px]">
+                <div>
+                  <span className="text-gray-500 block mb-0.5">Business Name</span>
+                  <span className="text-white font-bold">{myBusiness.name}</span>
+                </div>
+                <div>
+                  <span className="text-gray-500 block mb-0.5">Subscription Status</span>
+                  <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-[#FFA048]/20 text-[#FFA048] border border-[#FFA048]/30 inline-block">
+                    {myBusiness.status === 'active' ? '$50 Business Plan' : 'Suspended'} (Renews {myBusiness.membershipExpiryDate})
+                  </span>
+                </div>
+                <div>
+                  <span className="text-gray-500 block mb-0.5">Reference ID</span>
+                  <span className="text-white font-mono">{myBusiness.id}</span>
+                </div>
+                <div>
+                  <span className="text-gray-500 block mb-0.5">Category</span>
+                  <span className="text-white font-bold">{myBusiness.subcategory.en}</span>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       )}
 
@@ -184,6 +223,48 @@ export const AccountTab: React.FC<AccountTabProps> = ({ onOpenAuth, onSwitchTab 
               }`}
             >
               عربي
+            </button>
+            <button
+              onClick={() => setLanguage('fa')}
+              className={`px-2.5 py-1 text-[9px] font-black uppercase rounded ${
+                language === 'fa' ? 'bg-[#FFA048] text-black' : 'text-gray-400'
+              }`}
+            >
+              فارسی
+            </button>
+          </div>
+        </div>
+
+        {/* Theme Selection Bar */}
+        <div className="flex items-center justify-between p-4" id="row-theme-switch">
+          <span className="flex items-center gap-3 text-xs text-gray-300 font-semibold">
+            <Eye className="w-4.5 h-4.5 text-[#FFA048]" />
+            {language === 'en' ? 'Theme Preference' : 'تفضيل المظهر'}
+          </span>
+          <div className="flex gap-1.5 p-1 rounded-xl bg-[#0F0E0C] border border-[#2D2319]">
+            <button
+              onClick={() => setTheme('light')}
+              className={`px-2.5 py-1 text-[9px] font-black uppercase rounded ${
+                theme === 'light' ? 'bg-[#FFA048] text-black' : 'text-gray-400'
+              }`}
+            >
+              Light
+            </button>
+            <button
+              onClick={() => setTheme('dark')}
+              className={`px-2.5 py-1 text-[9px] font-black uppercase rounded ${
+                theme === 'dark' ? 'bg-[#FFA048] text-black' : 'text-gray-400'
+              }`}
+            >
+              Dark
+            </button>
+            <button
+              onClick={() => setTheme('system')}
+              className={`px-2.5 py-1 text-[9px] font-black uppercase rounded ${
+                theme === 'system' ? 'bg-[#FFA048] text-black' : 'text-gray-400'
+              }`}
+            >
+              System
             </button>
           </div>
         </div>

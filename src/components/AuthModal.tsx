@@ -64,11 +64,11 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
 
   const handleShortcutLogin = (shortcutRole: 'customer' | 'business' | 'admin') => {
     if (shortcutRole === 'customer') {
-      signIn('manimuhammad000@gmail.com', '+964 770 111 2222', 'customer', 'Mani Muhammad');
+      signIn('manimuhammad000@gmail.com', '+1 770 111 2222', 'customer', 'Mani Muhammad');
     } else if (shortcutRole === 'business') {
-      signIn('owner-alkawthar@gmail.com', '+964 770 123 4567', 'business', 'Hassan Al-Kawthar');
+      signIn('business@shiadirectory.com', '+1 770 123 4567', 'business', 'Hassan Al-Kawthar');
     } else {
-      signIn('admin@shiadirectory.com', '+964 780 000 0000', 'admin', 'Abu Murtadha (Admin)');
+      signIn('admin@shiadirectory.com', '+1 780 000 0000', 'admin', 'Abu Murtadha (Admin)');
     }
     onClose();
   };
@@ -182,7 +182,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
                 <label className="block text-xs font-medium text-gray-400 mb-1">{t.phone} *</label>
                 <div className="relative">
                   <Phone className="absolute left-3 top-3 w-4 h-4 text-gray-500" />
-                  <input type="tel" value={phone} onChange={(e) => { setPhone(e.target.value); setError(''); }} required placeholder="+964 770 000 0000" className={inputClass} id="signin-input-phone" />
+                  <input type="tel" value={phone} onChange={(e) => { setPhone(e.target.value); setError(''); }} required placeholder="+1 770 000 0000" className={inputClass} id="signin-input-phone" />
                 </div>
               </div>
               <button type="submit" className="w-full py-3 mt-2 rounded-xl bg-[#FFA048] text-black font-bold hover:bg-opacity-90 transition-all shadow-md text-sm active:scale-[0.98]" id="btn-signin-submit">
@@ -260,7 +260,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
                 <label className="block text-xs font-medium text-gray-400 mb-1">{t.phone} *</label>
                 <div className="relative">
                   <Phone className="absolute left-3 top-3 w-4 h-4 text-gray-500" />
-                  <input type="tel" value={phone} onChange={(e) => { setPhone(e.target.value); setError(''); }} required placeholder="+964 770 000 0000" className={inputClass} id="reg-input-phone" />
+                  <input type="tel" value={phone} onChange={(e) => { setPhone(e.target.value); setError(''); }} required placeholder="+1 770 000 0000" className={inputClass} id="reg-input-phone" />
                 </div>
               </div>
 
