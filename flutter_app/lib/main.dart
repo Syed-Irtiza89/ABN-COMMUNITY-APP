@@ -9,6 +9,8 @@ import 'screens/account_screen.dart';
 import 'screens/admin_panel_screen.dart';
 import 'models/models.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'data/translations.dart';
+import 'widgets/auth_modal.dart';
 
 void main() {
   runApp(
@@ -68,24 +70,38 @@ class MainNavigation extends StatefulWidget {
 
 class _MainNavigationState extends State<MainNavigation> {
   int _currentIndex = 0;
+  late List<Widget> _screens;
+
+  @override
+  void initState() {
+    super.initState();
+    _screens = [
+      const HomeScreen(),
+      const SearchScreen(),
+      const SavedScreen(),
+      BusinessPortalScreen(onOpenAuth: _openAuth),
+    ];
+  }
+
+  void _openAuth() {
+    showAuthModal(context);
+  }
 
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<DirectoryProvider>();
-    final isBusinessOwner = provider.currentUser?.role == UserRole.business;
+    final lang = provider.language;
     final isAdmin = provider.currentUser?.role == UserRole.admin;
 
-    final tabs = [
-      const HomeScreen(),
-      const SearchScreen(),
-      if (isBusinessOwner) const BusinessPortalScreen() else const SavedScreen(),
-      if (isAdmin) const AdminPanelScreen() else const AccountScreen(),
-    ];
+    final screens = List<Widget>.from(_screens);
+    if (isAdmin) {
+      screens.add(const AdminPanelScreen());
+    }
 
     return Scaffold(
       body: IndexedStack(
         index: _currentIndex,
-        children: tabs,
+        children: screens,
       ),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _currentIndex,
@@ -95,22 +111,27 @@ class _MainNavigationState extends State<MainNavigation> {
           });
         },
         destinations: [
-          const NavigationDestination(
-            icon: Icon(LucideIcons.home),
-            label: 'Home',
-          ),
-          const NavigationDestination(
-            icon: Icon(LucideIcons.search),
-            label: 'Search',
+          NavigationDestination(
+            icon: const Icon(LucideIcons.home),
+            label: t(lang, 'home'),
           ),
           NavigationDestination(
-            icon: Icon(isBusinessOwner ? LucideIcons.briefcase : LucideIcons.heart),
-            label: isBusinessOwner ? 'Business' : 'Saved',
+            icon: const Icon(LucideIcons.search),
+            label: t(lang, 'search'),
           ),
           NavigationDestination(
-            icon: Icon(isAdmin ? LucideIcons.shield : LucideIcons.user),
-            label: isAdmin ? 'Admin' : 'Account',
+            icon: const Icon(LucideIcons.heart),
+            label: t(lang, 'saved'),
           ),
+          NavigationDestination(
+            icon: const Icon(LucideIcons.briefcase),
+            label: t(lang, 'portal'),
+          ),
+          if (isAdmin)
+            const NavigationDestination(
+              icon: Icon(LucideIcons.sliders),
+              label: 'Admin',
+            ),
         ],
       ),
     );
